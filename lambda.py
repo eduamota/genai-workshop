@@ -16,51 +16,38 @@ def get_db_credentials():
     """
 
     secret_name = os.environ.get('SECRET_NAME')
-
-    # Create a Secrets Manager client
-    client = boto3.client(service_name='secretsmanager')
-    
+    print(secret_name)
     try:
-        # Retrieve the secret
-        get_secret_value_response = client.get_secret_value(SecretId=secret_name)
-        
-        # Error handling for missing secrets
-        if 'SecretString' in get_secret_value_response:
-            secret = get_secret_value_response['SecretString']
-            secret_dict = json.loads(secret)
-            return {
-                'user': secret_dict['username'],
-                'password': secret_dict['password'],
-                'host': secret_dict['host'],
-                'database': secret_dict['db']
-            }
-        else:
-            raise Exception("Secret binary not supported.")
+        return {
+            'user': 'postgres',
+            'password': f"{secret_name}",
+            'host': 'genai-workshop.cluster-c9micoqmu13m.us-west-2.rds.amazonaws.com',
+            'database': 'postgres'
+        }
 
     except Exception as e:
         print(f"Error retrieving secret: {str(e)}")
         return None
 
-# Initialize the AWS Bedrock client (replace 'service-name' with the actual AWS service used by Bedrock)
-def initialize_bedrock_client():
-    return boto3.client('bedrock-runtime')
+
 
 # Connect to the database
 def connect_database(conn_params, dictionary=False):
+    #print(conn_params)
     return psycopg2.Connection(**conn_params)
+    return None
 
 def get_tables():
     credentials = get_db_credentials()
     conn = connect_database(credentials)
-
+    print("getting tables")
     data = []
-    with conn.cursor() as cur:
-        cur.run("""SELECT table_schema x|| '.' || table_name
-FROM information_schema.tables
-WHERE table_type = 'BASE TABLE'
-AND table_schema NOT IN ('pg_catalog', 'information_schema');
+    results = conn.run("""SELECT table_name
+  FROM information_schema.tables
+ WHERE table_schema='public'
+   AND table_type='BASE TABLE';;
 """)
-        data.extend(cur.fetchall())
+    data.extend(results)
     return data
     
 def get_column_names(tableName):
@@ -68,15 +55,13 @@ def get_column_names(tableName):
     conn = connect_database(credentials)
     table_name = tableName[0]["value"]
     data = []
-    with conn.cursor() as cur:
-        cur.run(f"SHOW COLUMNS FROM {table_name}")
-        data.extend(cur.fetchall())
+    results = conn.run(f"SELECT column_name FROM information_schema.columns where table_name = '{table_name}'")
+    data.extend(results)
     return data
 
 def lambda_handler(event, context):
     action = event['actionGroup']
     api_path = event['apiPath']
-
     if api_path == '/tables':
         body = get_tables()
     elif api_path == '/table/{tableName}/columns':
