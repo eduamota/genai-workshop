@@ -1,0 +1,10 @@
+
+Base on the following table schema, build an sql query based on the request of the customer.
+<schema>
+tables: "[['excavatordata'], ['bulldozerdata'], ['cranedata'], ['dumptruckdata'], ['concretemixerdata']]"
+column names: "[['fuelconsumptionliters'], ['maintenancealerts'], ['hoursoperated'], ['day'], ['distancecoveredkm'], ['loadhandledtons'], ['machine']]"
+</schema>
+
+<request>
+
+</request
