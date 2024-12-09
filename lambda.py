@@ -19,7 +19,7 @@ def get_db_credentials():
     print(secret_name)
     try:
         return {
-            'user': 'postgres',
+            'user': 'bedrock_user',
             'password': f"{secret_name}",
             'host': 'genai-workshop.cluster-c9micoqmu13m.us-west-2.rds.amazonaws.com',
             'database': 'postgres'
@@ -45,7 +45,7 @@ def get_tables():
     results = conn.run("""SELECT table_name
   FROM information_schema.tables
  WHERE table_schema='public'
-   AND table_type='BASE TABLE';;
+   AND table_type='BASE TABLE';
 """)
     data.extend(results)
     return data
@@ -59,6 +59,15 @@ def get_column_names(tableName):
     data.extend(results)
     return data
 
+def execute_query(query):
+    credentials = get_db_credentials()
+    conn = connect_database(credentials)
+    table_name = query[0]["value"]
+    data = []
+    results = conn.run(query)
+    data.extend(results)
+    return data
+
 def lambda_handler(event, context):
     action = event['actionGroup']
     api_path = event['apiPath']
@@ -67,6 +76,9 @@ def lambda_handler(event, context):
     elif api_path == '/table/{tableName}/columns':
         parameters = event['parameters']
         body = get_column_names(parameters)
+    elif api_path == '/execute-query':
+        parameters = event['parameters']
+        body = execute_query(parameters)
     else:
         body = {"{}::{} is not a valid api, try another one.".format(action, api_path)}
 
