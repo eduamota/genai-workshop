@@ -1,19 +1,19 @@
 {
     "openapi": "3.0.0",
     "info": {
-        "title": "Database Management API",
+        "title": "API de Gestión de Bases de Datos",  
         "version": "1.0.0",
-        "description": "API to manage database operations such as fetching tables and columns and running queries."
+        "description": "API para gestionar operaciones de bases de datos como la obtención de tablas y columnas y la ejecución de consultas." 
     },
     "paths": {
         "/tables": {
             "get": {
-                "summary": "Get list of all tables",
-                "description": "Returns a list of all tables in the database. The database contains data for a bulldozer, concrete mixer, crane, dumpt truck, and excavator.",
+                "summary": "Obtener lista de todas las tablas", 
+                "description": "Devuelve una lista de todas las tablas en la base de datos. La base de datos contiene datos para una excavadora, hormigonera, grúa, camión volquete y excavadora.", 
                 "operationId": "getTables",
                 "responses": {
                     "200": {
-                        "description": "Successful response",
+                        "description": "Respuesta exitosa",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -35,14 +35,14 @@
         },
         "/table/{tableName}/columns": {
             "get": {
-                "summary": "Get column names of a specific table",
-                "description": "Returns a list of column names for the specified table.",
+                "summary": "Obtener nombres de columna de una tabla específica", 
+                "description": "Devuelve una lista de nombres de columna para la tabla especificada.",  
                 "operationId": "getColumnNames",
                 "parameters": [
                     {
                         "name": "tableName",
                         "in": "path",
-                        "description": "Name of the table to get column names for",
+                        "description": "Nombre de la tabla para obtener los nombres de columna", 
                         "required": true,
                         "schema": {
                             "type": "string"
@@ -51,7 +51,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Successful response",
+                        "description": "Respuesta exitosa", 
                         "content": {
                             "application/json": {
                                 "schema": {
